@@ -40,7 +40,7 @@ public class AppController {
      * @return ResponseResult
      */
     @RequestMapping(value = "/callback")
-    public ResponseResult callback(HttpServletRequest request) {
+    public ResponseResult<Object> callback(HttpServletRequest request) {
 
         // 解析回调公共入参, 回调入参请参考官方文档，公共入参requestId, eventType, 不同的eventType代表不同回调类型，入参也不同
         CallbackCommonArgs callbackCommonArgs = new CallbackCommonArgs();
@@ -115,6 +115,19 @@ public class AppController {
                 UserProfileCallbackResult userProfileCallbackResult = new UserProfileCallbackResult();
                 userProfileCallbackResult.setUserProfileList(userProfileList);
                 return ResponseResult.getSuccessResult(requestId, userProfileCallbackResult);
+            }
+            // 合法域名校验失败回调通知
+            case "hostCheckCallback": {
+                // 解析入参
+                HostCheckCallbackRequest hostCheckCallbackRequest = new HostCheckCallbackRequest();
+                RequestUtil.requestToParamObject(request, hostCheckCallbackRequest);
+
+                // 业务逻辑：感知客户端异常访问，通过业务告警等方式，排查客户端跨域问题
+                log.error(hostCheckCallbackRequest.toString());
+                // ...
+
+                // 接受通知成功时返回响应
+                return ResponseResult.getSuccessResult(requestId, true);
             }
             default:
                 return ResponseResult.getErrorResult(requestId, "1001", "ISVCallBackEventTypeError");

@@ -9,8 +9,15 @@
 3. 项目打包部署:
 
 ```bash
-# 在项目目录下
+# a.在项目目录下使用如下命令打包工程:
 mvn clean package -Dmaven.test.skip=true
-# 将target目录下的rtc-white-board.jar上传部署环境，启动服务
+
+# b.将target目录下的rtc-white-board.jar上传部署环境(推荐使用ECS服务器), 使用如下命令启动服务:
 nohup java -jar rtc-white-board.jar &
+
+# c.监看服务日志
+tail -f nohup.out
+
+# 若因端口被占用而启动失败，可尝试使用以下命令杀死占用7001端口的所有java进程
+lsof -i:7001 | grep java | awk '{print $2}' | xargs kill -9
 ```
